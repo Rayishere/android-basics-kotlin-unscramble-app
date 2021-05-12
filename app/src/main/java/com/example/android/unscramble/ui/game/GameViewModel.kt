@@ -1,11 +1,6 @@
 package com.example.android.unscramble.ui.game
 
-import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.FragmentContainer
 import androidx.lifecycle.ViewModel
 
 
@@ -14,7 +9,7 @@ class GameViewModel:ViewModel() {
     // Declare private mutable variable
     // only be modified within the class it is declared
     private var _score = 0
-    private var currentWordCount = 0
+    private var _currentWordCount = 0
     private lateinit var _currentScrambledWord: String // No initial value provided
 
     val currentScrambledWord: String
@@ -22,6 +17,9 @@ class GameViewModel:ViewModel() {
 
     val score: Int
         get() = _score //backing property
+
+    val currentWordCount: Int
+        get() = _currentWordCount
 
     // a log statement with initializer block
     // initial setup code <-- initialization of an object
@@ -63,7 +61,7 @@ class GameViewModel:ViewModel() {
             // convert from charArray to String
             _currentScrambledWord = String(tempWord)
             // update the currentWordCount + 1
-            ++currentWordCount
+            ++_currentWordCount
             // add the new word to the "wordsList"
             wordsList.add(currentWord)
         }
@@ -74,7 +72,7 @@ class GameViewModel:ViewModel() {
      *  Updates the next word
      */
     fun nextWord():Boolean{
-        return if(currentWordCount < MAX_NO_OF_WORDS){
+        return if(_currentWordCount < MAX_NO_OF_WORDS){
             getNextWord()
             true
         }else false
