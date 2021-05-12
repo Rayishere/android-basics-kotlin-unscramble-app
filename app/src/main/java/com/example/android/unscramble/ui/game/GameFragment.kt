@@ -133,7 +133,26 @@ class GameFragment : Fragment(){
         Log.d("GameFragment", "GameFragment destroyed!")
     }
 
-
+    /**
+     * MaterialAlertDialog <-- interaction dialog
+     * Creates and shows an AlertDialog with the final score
+     * "MaterialAlertDialogBuilder" constructor passing in the content
+     * using the fragment's "requireContext()" method (non-Null).
+     * ===================================
+     * setNegativeButton(getString.(R.string.exit, {_, _ -> exitGame()})
+     * --> takes 2 parameters: a "String" & a function
+     * "DialogInterface.OnClickListener()" <-- can be in lambda
+     * the expression here is "trailing lambda syntax"
+     */
+    private fun  showFinalScoreDialog(){
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.congratulations))
+            .setMessage(getString(R.string.you_scored, viewModel.score))
+            .setCancelable(false)
+            .setNegativeButton(getString(R.string.exit)){_, _ -> exitGame()}
+            .setPositiveButton(getString(R.string.play_again)){_, _ -> restartGame()}
+            .show()
+    }
 
 
 }
