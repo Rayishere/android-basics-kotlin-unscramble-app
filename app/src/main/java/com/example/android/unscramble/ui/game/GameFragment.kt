@@ -30,7 +30,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 /**
  * Fragment where the game is played, contains the game logic.
  */
-class GameFragment : Fragment(){
+class GameFragment : Fragment() {
 
     // Binding object instance with access to the views in the game_fragment.xml layout
     private lateinit var binding: GameFragmentBinding
@@ -44,9 +44,9 @@ class GameFragment : Fragment(){
     // triggered when the fragment is created for the 1st time
     // each time the fragment is recreated for any events: configuration changes
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         // Inflate the layout XML file and return a binding object instance
         binding = GameFragmentBinding.inflate(inflater, container, false)
@@ -64,14 +64,26 @@ class GameFragment : Fragment(){
         updateNextWordOnScreen()
         binding.score.text = getString(R.string.score, 0)
         binding.wordCount.text = getString(
-                R.string.word_count, 0, MAX_NO_OF_WORDS)
+            R.string.word_count, 0, MAX_NO_OF_WORDS
+        )
     }
 
     /*
-    * Checks the user's word, and updates the score accordingly.
-    * Displays the next scrambled word.
-    */
+   * Checks the user's word, and updates the score accordingly.
+   * Displays the next scrambled word.
+   */
     private fun onSubmitWord() {
+        val playerWord = binding.textInputEditText.text.toString()
+        if (viewModel.isUSerWordCorrect(playerWord)) {
+            setErrorTextField(false)
+            if (viewModel.nextWord()) {
+                updateNextWordOnScreen()
+            } else {
+                showFinalScoreDialog()
+            }
+        }else{
+            setErrorTextField(true)
+        }
 
     }
 
@@ -80,6 +92,12 @@ class GameFragment : Fragment(){
      * Increases the word count.
      */
     private fun onSkipWord() {
+        if (viewModel.nextWord()){
+            setErrorTextField(false)
+            updateNextWordOnScreen()
+        }else{
+            showFinalScoreDialog()
+        }
 
     }
 
@@ -144,13 +162,13 @@ class GameFragment : Fragment(){
      * "DialogInterface.OnClickListener()" <-- can be in lambda
      * the expression here is "trailing lambda syntax"
      */
-    private fun  showFinalScoreDialog(){
+    private fun showFinalScoreDialog() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.congratulations))
             .setMessage(getString(R.string.you_scored, viewModel.score))
             .setCancelable(false)
-            .setNegativeButton(getString(R.string.exit)){_, _ -> exitGame()}
-            .setPositiveButton(getString(R.string.play_again)){_, _ -> restartGame()}
+            .setNegativeButton(getString(R.string.exit)) { _, _ -> exitGame() }
+            .setPositiveButton(getString(R.string.play_again)) { _, _ -> restartGame() }
             .show()
     }
 

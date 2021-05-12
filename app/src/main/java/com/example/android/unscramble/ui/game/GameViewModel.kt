@@ -79,4 +79,19 @@ class GameViewModel:ViewModel() {
             true
         }else false
     }
+
+    // A helper method to validate player word
+    private fun increaseScore(){
+        _score += SCORE_INCREASE
+    }
+
+    // check the word is correct
+    fun isUSerWordCorrect(playerWord: String):Boolean{
+        if(playerWord.equals(currentWord, true)){
+            increaseScore()
+            return true
+        }
+        return false
+    }
+
 }
