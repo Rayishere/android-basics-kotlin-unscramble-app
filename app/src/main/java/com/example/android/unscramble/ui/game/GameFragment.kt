@@ -68,6 +68,14 @@ class GameFragment : Fragment() {
         binding.wordCount.text = getString(
             R.string.word_count, 0, MAX_NO_OF_WORDS
         )
+
+        // Observe the currentScrambledWord LiveData
+        // viewLifecycleOwner <-- Fragment's View lifecycle
+        // aware of "STARTED" or "RESUMED"
+        viewModel.currentScrambledWord.observe(viewLifecycleOwner,
+            {
+                newWord -> binding.textViewUnscrambledWord.text = newWord
+            })
     }
 
     /*
@@ -117,6 +125,7 @@ class GameFragment : Fragment() {
      * restart the game.
      */
     private fun restartGame() {
+        viewModel.reinitializeData()
         setErrorTextField(false)
         updateNextWordOnScreen()
     }
@@ -145,7 +154,8 @@ class GameFragment : Fragment() {
      * Displays the next scrambled word on screen.
      */
     private fun updateNextWordOnScreen() {
-        binding.textViewUnscrambledWord.text = viewModel.currentScrambledWord
+        // TODO: NEED TO CHECK Later
+        binding.textViewUnscrambledWord.text = viewModel.currentScrambledWord.toString()
     }
 
     override fun onDetach() {
@@ -167,7 +177,7 @@ class GameFragment : Fragment() {
     private fun showFinalScoreDialog() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.congratulations))
-            .setMessage(getString(R.string.you_scored, viewModel.score))
+            .setMessage(getString(R.string.you_scored, viewModel.score.value))
             .setCancelable(false)
             .setNegativeButton(getString(R.string.exit)) { _, _ -> exitGame() }
             .setPositiveButton(getString(R.string.play_again)) { _, _ -> restartGame() }

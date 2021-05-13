@@ -1,6 +1,8 @@
 package com.example.android.unscramble.ui.game
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 
@@ -8,18 +10,21 @@ class GameViewModel:ViewModel() {
 
     // Declare private mutable variable
     // only be modified within the class it is declared
-    private var _score = 0
-    private var _currentWordCount = 0
-    private lateinit var _currentScrambledWord: String // No initial value provided
+    private val _score = MutableLiveData(0)
 
-    val currentScrambledWord: String
-        get() =_currentScrambledWord
-
-    val score: Int
+    val score: LiveData<Int>
         get() = _score //backing property
 
-    val currentWordCount: Int
+    private val _currentWordCount = MutableLiveData(0)
+
+    val currentWordCount: LiveData<Int>
         get() = _currentWordCount
+
+    private val _currentScrambledWord = MutableLiveData<String>()
+        // No initial value provided
+
+    val currentScrambledWord: LiveData<String>
+        get() =_currentScrambledWord
 
     // a log statement with initializer block
     // initial setup code <-- initialization of an object
@@ -59,9 +64,10 @@ class GameViewModel:ViewModel() {
             getNextWord()
         }else{
             // convert from charArray to String
-            _currentScrambledWord = String(tempWord)
+            // access the data form "LiveData"
+            _currentScrambledWord.value = String(tempWord)
             // update the currentWordCount + 1
-            ++_currentWordCount
+            _currentWordCount.value = (_currentWordCount.value)?.inc()
             // add the new word to the "wordsList"
             wordsList.add(currentWord)
         }
@@ -72,7 +78,7 @@ class GameViewModel:ViewModel() {
      *  Updates the next word
      */
     fun nextWord():Boolean{
-        return if(_currentWordCount < MAX_NO_OF_WORDS){
+        return if(_currentWordCount.value!! < MAX_NO_OF_WORDS){
             getNextWord()
             true
         }else false
@@ -80,7 +86,7 @@ class GameViewModel:ViewModel() {
 
     // A helper method to validate player word
     private fun increaseScore(){
-        _score += SCORE_INCREASE
+        _score.value = (_score.value)?.plus(SCORE_INCREASE)
     }
 
     // check the word is correct
@@ -91,5 +97,14 @@ class GameViewModel:ViewModel() {
         }
         return false
     }
+
+    // Re-initializes the game data to restart the game
+    fun reinitializeData(){
+        _score.value = 0
+        _currentWordCount.value = 0
+        wordsList.clear()
+        getNextWord()
+    }
+
 
 }
