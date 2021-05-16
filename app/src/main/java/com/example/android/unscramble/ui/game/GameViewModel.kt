@@ -1,8 +1,12 @@
 package com.example.android.unscramble.ui.game
 
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.TtsSpan
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 
 
@@ -23,9 +27,26 @@ class GameViewModel:ViewModel() {
     private val _currentScrambledWord = MutableLiveData<String>()
         // No initial value provided
 
-    val currentScrambledWord: LiveData<String>
-        get() =_currentScrambledWord
-
+    // convert to Spannable for Google Talk-back feature
+    val currentScrambledWord: LiveData<Spannable> = Transformations.map(_currentScrambledWord){
+        if(it == null){
+            SpannableString("")
+        }else{
+            val scrambledWord = it.toString()
+            val spannable: Spannable = SpannableString(scrambledWord)
+            spannable.setSpan(
+                TtsSpan.VerbatimBuilder(scrambledWord).build(),
+                0,
+                scrambledWord.length,
+                Spannable.SPAN_INCLUSIVE_INCLUSIVE
+            )
+            spannable
+        }
+    }
+       // get() =_currentScrambledWord
+// The list and strings are needed to declare first
+    private var wordsList: MutableList<String> = mutableListOf()
+    private lateinit var currentWord:String
     // a log statement with initializer block
     // initial setup code <-- initialization of an object
     // fist created the object and initialized
@@ -36,13 +57,14 @@ class GameViewModel:ViewModel() {
 
     // the [ViewModel] is destroyed when the associated fragment is detached
     // or the activity is finished. --> [onCleared()] is called
+    /*
     override fun onCleared() {
         super.onCleared()
         Log.d("GameFragment", "GameViewModel destroyed!")
     }
+    */
 
-    private var wordsList: MutableList<String> = mutableListOf()
-    private lateinit var currentWord:String
+
 
     /**
      * Updates currentWord & currentScrambledWord with the next word
@@ -65,6 +87,7 @@ class GameViewModel:ViewModel() {
         }else{
             // convert from charArray to String
             // access the data form "LiveData"
+            Log.d("Unscramble", "currentWord= $currentWord")
             _currentScrambledWord.value = String(tempWord)
             // update the currentWordCount + 1
             _currentWordCount.value = (_currentWordCount.value)?.inc()
@@ -105,6 +128,4 @@ class GameViewModel:ViewModel() {
         wordsList.clear()
         getNextWord()
     }
-
-
 }
